@@ -82,13 +82,12 @@ trap(struct trapframe *tf)
     if(myproc() && (tf->cs & 3) == DPL_USER){
       uint addr = rcr2();
       if(addr < PGSIZE)
-        cprintf("NULL DEREFERENCE: pid (%d) %s: page fault at addr 0x%x eip 0x%x\n", myproc()->pid, myproc()->name, addr, tf->eip);
-      else
-        cprintf("pid (%d) %s: page fault at addr 0x%x eip 0x%x\n", myproc()->pid, myproc()->name, addr, tf->eip);
+        cprintf("likely null dereference: ");
+      cprintf("pid %d %s: page fault at addr 0x%x eip 0x%x\n", myproc()->pid, myproc()->name, addr, tf->eip);
  
       //cprintf("--kill proc\n");
       myproc()->killed = 1;
-      return;
+      break;
     }
     // doesn't break if kernel page fault, fallthrough to default
 

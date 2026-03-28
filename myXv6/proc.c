@@ -129,15 +129,15 @@ userinit(void)
   if((p->pgdir = setupkvm()) == 0)
     panic("userinit: out of memory?");
   inituvm(p->pgdir, _binary_initcode_start, (int)_binary_initcode_size);
-  p->sz = PGSIZE;
+  p->sz = 2 * PGSIZE;  // Shifted up by a page, so total size is now 2 pages
   memset(p->tf, 0, sizeof(*p->tf));
   p->tf->cs = (SEG_UCODE << 3) | DPL_USER;
   p->tf->ds = (SEG_UDATA << 3) | DPL_USER;
   p->tf->es = p->tf->ds;
   p->tf->ss = p->tf->ds;
   p->tf->eflags = FL_IF;
-  p->tf->esp = PGSIZE;
-  p->tf->eip = 0;  // beginning of initcode.S
+  p->tf->esp = 2 * PGSIZE; // Stack pointer shifts up
+  p->tf->eip = PGSIZE;     // Instruction pointer starts at 0x1000
 
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
